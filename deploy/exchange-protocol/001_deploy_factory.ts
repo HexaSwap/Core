@@ -5,9 +5,6 @@ import {DeployFunction} from "hardhat-deploy/types";
 export const SWAP_FACTORY_DID = "SWAP_FACTORY_DID";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  // Compile contracts
-  await run("compile");
-  console.log("Compiled contracts.");
 
   const networkName: string = network.name;
 
@@ -15,7 +12,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log("Deploying HexaFinityFactory...");
 
-  const {deployments, getNamedAccounts} = hre;
+  const {deployments, getNamedAccounts, run} = hre;
   const {deploy} = deployments;
 
   const {deployer, feeSetter} = await getNamedAccounts();
@@ -27,6 +24,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ],
     log: true,
   });
+
+  try {
+    await run("verify:verify", {
+      address: deployment.address,
+      constructorArguments: [
+        feeSetter
+      ],
+    });
+    console.log("HexaFinityFactory verify success");
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export default func;

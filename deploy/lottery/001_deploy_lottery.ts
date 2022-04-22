@@ -39,6 +39,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         log: true,
       });
 
+      try {
+        await run("verify:verify", {
+          address: randomNumberGenerator.address,
+          constructorArguments: [
+            VRF_COORDINATOR_TESTNET,
+            LINK_TESTNET
+          ],
+        });
+        console.log("RandomNumberGenerator verify success");
+      } catch (e) {
+        console.log(e);
+      }
+
       console.log("RandomNumberGenerator deployed to:", randomNumberGenerator.address);
 
       // Set fee
@@ -66,6 +79,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         log: true,
       });
 
+      try {
+        await run("verify:verify", {
+          address: randomNumberGenerator.address,
+          constructorArguments: [
+          ],
+        });
+        console.log("MockRandomNumberGenerator verify success");
+      } catch (e) {
+        console.log(e);
+      }
+
       console.log("RandomNumberGenerator deployed to:", randomNumberGenerator.address);
     }
 
@@ -77,6 +101,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       ],
       log: true,
     });
+
+    try {
+      await run("verify:verify", {
+        address: hexaFinitySwapLottery.address,
+        constructorArguments: [
+          hexa.address,
+          randomNumberGenerator.address
+        ],
+      });
+      console.log("HexaFinitySwapLottery verify success");
+    } catch (e) {
+      console.log(e);
+    }
 
     console.log("HexaFinitySwapLottery deployed to:", hexaFinitySwapLottery.address);
 
@@ -97,6 +134,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       ],
       log: true,
     });
+
+    try {
+      await run("verify:verify", {
+        address: randomNumberGenerator.address,
+        constructorArguments: [
+          VRF_COORDINATOR_MAINNET,
+          LINK_MAINNET
+        ],
+      });
+      console.log("RandomNumberGenerator verify success");
+    } catch (e) {
+      console.log(e);
+    }
 
     console.log("RandomNumberGenerator deployed to:", randomNumberGenerator.address);
 
@@ -126,6 +176,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       ],
       log: true,
     });
+
+    try {
+      await run("verify:verify", {
+        address: hexaFinitySwapLottery.address,
+        constructorArguments: [
+          hexa.address,
+          randomNumberGenerator.address
+        ],
+      });
+      console.log("HexaFinitySwapLottery verify success");
+    } catch (e) {
+      console.log(e);
+    }
 
     console.log("HexaFinitySwapLottery deployed to:", hexaFinitySwapLottery.address);
 

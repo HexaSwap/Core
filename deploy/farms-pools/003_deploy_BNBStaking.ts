@@ -48,6 +48,24 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ],
     log: true,
   });
+
+  try {
+    await run("verify:verify", {
+      address: deployment.address,
+      constructorArguments: [
+        wbnb.address,
+        hexa.address,
+        REWARD_PER_BLOCK,
+        blockNumber.toString(),
+        (blockNumber + Number(BLOCK_LENGTH)).toString(),
+        Admin,
+        wbnb.address,
+      ],
+    });
+    console.log("BnbStaking verify success");
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export default func;

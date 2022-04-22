@@ -33,6 +33,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ],
     log: true,
   });
+
+  try {
+    await run("verify:verify", {
+      address: deployment.address,
+      constructorArguments: [
+        factory.address,
+        wbnb.address
+      ],
+    });
+    console.log("HexaFinityRouter verify success");
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export default func;

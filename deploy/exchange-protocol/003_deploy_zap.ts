@@ -35,6 +35,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ],
     log: true,
   });
+
+  try {
+    await run("verify:verify", {
+      address: deployment.address,
+      constructorArguments: [
+        wbnb.address,
+        router.address,
+        MAX_ZAP_REVERSE_RATIO
+      ],
+    });
+    console.log("HexaFinityZapV1 verify success");
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export default func;

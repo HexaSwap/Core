@@ -29,6 +29,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ],
     log: true,
   });
+
+  try {
+    await run("verify:verify", {
+      address: deployment.address,
+      constructorArguments: [
+        hexa.address
+      ],
+    });
+    console.log("SyrupBar verify success");
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export default func;

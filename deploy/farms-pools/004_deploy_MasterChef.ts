@@ -46,6 +46,22 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ],
     log: true,
   });
+
+  try {
+    await run("verify:verify", {
+      address: deployment.address,
+      constructorArguments: [
+        hexa.address,
+        syrup.address,
+        dev,
+        REWARD_PER_BLOCK,
+        blockNumber.toString()
+      ],
+    });
+    console.log("MasterChef verify success");
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export default func;

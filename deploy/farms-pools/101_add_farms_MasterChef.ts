@@ -38,6 +38,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       log: true,
     });
 
+    try {
+      await run("verify:verify", {
+        address: lpDeployment.address,
+        constructorArguments: [
+          "LPToken",
+          "LP1",
+          parseEther("1000000")
+        ],
+      });
+      console.log("MockBEP20 verify success");
+    } catch (e) {
+      console.log(e);
+    }
+
     lp = lpDeployment.address;
   }
 

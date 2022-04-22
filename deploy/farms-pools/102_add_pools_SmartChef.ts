@@ -60,6 +60,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     });
     console.log("Mock Pool Token:", ptDeployment.address); // 0xa6d1786Fc22c232150885A3D7B22dFe3a5812E0b
 
+    try {
+      await run("verify:verify", {
+        address: ptDeployment.address,
+        constructorArguments: [
+          "Mock Pool Token 1",
+          "PT1",
+          parseEther("1000000")
+        ],
+      });
+      console.log("MockBEP20 verify success");
+    } catch (e) {
+      console.log(e);
+    }
+
     const pool = await deploy("SmartChef", {
       from: deployer,
       args: [
@@ -72,6 +86,23 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       ],
       log: true,
     });
+
+    try {
+      await run("verify:verify", {
+        address: pool.address,
+        constructorArguments: [
+          ptDeployment.address,
+          POOL_REWARD_TOKEN,
+          parseEther(REWARD_PER_BLOCK),
+          blockNumber.toString(),
+          (blockNumber + Number(BLOCK_LENGTH)).toString(),
+          parseEther("0"),
+        ],
+      });
+      console.log("MockBEP20 verify success");
+    } catch (e) {
+      console.log(e);
+    }
 
     console.log("Pool deployed at", pool.address); // 0x8723e0Ae254C52997DbB2D3CFC0FD9231A25dF0e
   }
