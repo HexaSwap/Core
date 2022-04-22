@@ -1,8 +1,16 @@
 {
-  "name": "hardhat-tutorial",
+  "name": "hexa-finity-contracts",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Hexa Finity contracts",
   "license": "MIT",
+  "repository": "https://github.com/HexaFinity/hexa-finity-contracts",
+  "author": "HexaFinity",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy:tesnet": "npx hardhat deploy --network testnet",
+    "deploy:mainnet": "npx hardhat deploy --network mainnet"
+  },
   "devDependencies": {
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.2",
