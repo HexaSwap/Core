@@ -19,9 +19,9 @@ This repo contains all the contracts used in Hexa Finity. It is divided in indep
 | [Profile, NFT, and Gamification](./projects/profile-nft-gamification) | Hexa Finity Bunnies NFT, NFT factories, and Profile system.                                                                | 0.6.12                   |
 | [SmartChef Factory](./projects/smartchef)                             | SmartChef (a.k.a. Syrup Pools) Factory                                                                                     | 0.6.12 (v1) / 0.8.4 (v2) | -->
 
-## Create a new project
+<!-- ## Create a new project
 
 1 - Create a new folder inside `projects` <br/>
 2 - Run `yarn init`
 
-Commands inside the root `package.json` starting with `lerna` will run the corresponding command in each subproject.
+Commands inside the root `package.json` starting with `lerna` will run the corresponding command in each subproject. -->
