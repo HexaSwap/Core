@@ -1,39 +1,37 @@
-import { network, run } from "hardhat";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {DeployFunction} from "hardhat-deploy/types";
+import { network, run } from 'hardhat';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { DeployFunction } from 'hardhat-deploy/types';
 
-export const WBNB_DID = "WBNB";
+export const WBNB_DID = 'WBNB';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Compile contracts
-  await run("compile");
-  console.log("Compiled contracts.");
+  await run('compile');
+  console.log('Compiled contracts.');
 
   const networkName = network.name;
 
-  console.log("Deploying to network:", networkName);
+  console.log('Deploying to network:', networkName);
 
-  console.log("Deploying WBNB...");
+  console.log('Deploying WBNB...');
 
-  const {deployments, getNamedAccounts} = hre;
-  const {deploy} = deployments;
+  const { deployments, getNamedAccounts } = hre;
+  const { deploy } = deployments;
 
-  const {deployer} = await getNamedAccounts();
+  const { deployer } = await getNamedAccounts();
 
-  const deployment = await deploy("WBNB", {
+  const deployment = await deploy('WBNB', {
     from: deployer,
-    args: [
-    ],
+    args: [],
     log: true,
   });
 
   try {
-    await run("verify:verify", {
+    await run('verify:verify', {
       address: deployment.address,
-      constructorArguments: [
-      ],
+      constructorArguments: [],
     });
-    console.log("WBNB verify success");
+    console.log('WBNB verify success');
   } catch (e) {
     console.log(e);
   }
@@ -41,4 +39,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 export default func;
 func.id = WBNB_DID;
-func.tags = ["local", "testnet", "mainnet", "init", "wbnb", WBNB_DID];
+func.tags = ['local', 'testnet', 'mainnet', 'init', 'wbnb', WBNB_DID];

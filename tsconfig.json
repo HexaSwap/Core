@@ -10,11 +10,5 @@
     "declaration": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "hardhat.config.ts",
-    "./scripts",
-    "./deploy",
-    "./test",
-    "typechain/**/*"
-  ]
+  "include": ["hardhat.config.ts", "./scripts", "./deploy", "./test", "typechain/**/*"]
 }

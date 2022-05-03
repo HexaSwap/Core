@@ -9,7 +9,8 @@
     "compile": "npx hardhat compile",
     "test": "npx hardhat test",
     "deploy:tesnet": "npx hardhat deploy --network testnet",
-    "deploy:mainnet": "npx hardhat deploy --network mainnet"
+    "deploy:mainnet": "npx hardhat deploy --network mainnet",
+    "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\""
   },
   "devDependencies": {
     "@types/chai": "^4.3.1",
