@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Hexa Finity contracts",
   "license": "MIT",
-  "repository": "https://github.com/HexaFinity/hexa-finity-contracts",
+  "repository": "https://github.com/HexaFinity/Core",
   "author": "HexaFinity",
   "scripts": {
     "compile": "npx hardhat compile",
