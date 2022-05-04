@@ -1,4 +1,4 @@
-import { Contract, providers, utils, BigNumber } from 'ethers';
+import { Contract, utils, BigNumber, providers } from 'ethers';
 import { ethers } from 'hardhat';
 
 export async function setupUsers<T extends { [contractName: string]: Contract }>(
@@ -95,7 +95,7 @@ export async function getApprovalDigest(
   );
 }
 
-export async function mineBlock(provider: providers.Web3Provider, timestamp: number): Promise<void> {
+export async function mineBlock(provider: providers.JsonRpcProvider, timestamp: number): Promise<void> {
   // eslint-disable-next-line no-async-promise-executor
   await new Promise(async (resolve, reject) => {
     (provider.send as any)(

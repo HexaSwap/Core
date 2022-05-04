@@ -86,7 +86,7 @@ contract HexaFinityPair is IHexaFinityPair, HexaFinityERC20 {
         emit Sync(reserve0, reserve1);
     }
 
-    // if fee is on, mint liquidity equivalent to 8/25 of the growth in sqrt(k)
+    // if fee is on, mint liquidity equivalent to 1/6th of the growth in sqrt(k)
     function _mintFee(uint112 _reserve0, uint112 _reserve1) private returns (bool feeOn) {
         address feeTo = IHexaFinityFactory(factory).feeTo();
         feeOn = feeTo != address(0);
@@ -96,8 +96,8 @@ contract HexaFinityPair is IHexaFinityPair, HexaFinityERC20 {
                 uint rootK = Math.sqrt(uint(_reserve0).mul(_reserve1));
                 uint rootKLast = Math.sqrt(_kLast);
                 if (rootK > rootKLast) {
-                    uint numerator = totalSupply.mul(rootK.sub(rootKLast)).mul(8);
-                    uint denominator = rootK.mul(17).add(rootKLast.mul(8));
+                    uint numerator = totalSupply.mul(rootK.sub(rootKLast));
+                    uint denominator = rootK.mul(3).add(rootKLast);
                     uint liquidity = numerator / denominator;
                     if (liquidity > 0) _mint(feeTo, liquidity);
                 }
@@ -178,9 +178,9 @@ contract HexaFinityPair is IHexaFinityPair, HexaFinityERC20 {
         uint amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
         require(amount0In > 0 || amount1In > 0, 'HexaFinity: INSUFFICIENT_INPUT_AMOUNT');
         { // scope for reserve{0,1}Adjusted, avoids stack too deep errors
-        uint balance0Adjusted = (balance0.mul(10000).sub(amount0In.mul(25)));
-        uint balance1Adjusted = (balance1.mul(10000).sub(amount1In.mul(25)));
-        require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(10000**2), 'HexaFinity: K');
+        uint balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(2));
+        uint balance1Adjusted = balance1.mul(1000).sub(amount1In.mul(2));
+        require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(1000**2), 'HexaFinity: K');
         }
 
         _update(balance0, balance1, _reserve0, _reserve1);
