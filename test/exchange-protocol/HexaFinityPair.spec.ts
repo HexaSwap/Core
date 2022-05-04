@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { BigNumber, constants, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from 'hardhat-deploy-ethers/signers';
-import { encodePrice, expandTo18Decimals } from '../utils';
+import { expandTo18Decimals } from '../utils';
 
 import HexaFinityPair from '../../artifacts/src/exchange-protocol/HexaFinityPair.sol/HexaFinityPair.json';
 
