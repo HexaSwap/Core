@@ -30,7 +30,7 @@ describe('HexaFinityPair contract', () => {
   // time. It receives a callback, which can be async.
   beforeEach(async () => {
     const fixture = await loadFixture(coreFixture);
-    factory = fixture.factory;
+    factory = fixture.factoryV2;
     token0 = fixture.token0;
     token1 = fixture.token1;
     pair = fixture.pair;

@@ -32,7 +32,7 @@ describe('HexaFinityFactory contract', () => {
   // time. It receives a callback, which can be async.
   beforeEach(async () => {
     const fixture = await loadFixture(coreFixture);
-    factory = fixture.factory;
+    factory = fixture.factoryV2;
   });
 
   describe('Deployment', () => {
