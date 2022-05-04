@@ -15,15 +15,19 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
 
     address public immutable override factory;
     address public immutable override WETH;
+    address public override feeToSetter;
+    address public override swappingFeeTo;
+    uint256 public override swappingFee;
 
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, "HexaFinityRouter: EXPIRED");
         _;
     }
 
-    constructor(address _factory, address _WETH) public {
+    constructor(address _factory, address _WETH, address _feeToSetter) public {
         factory = _factory;
         WETH = _WETH;
+        feeToSetter = _feeToSetter;
     }
 
     receive() external payable {
@@ -494,5 +498,20 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         returns (uint256[] memory amounts)
     {
         return HexaFinityLibrary.getAmountsIn(factory, amountOut, path);
+    }
+
+    function setSwappingFee(uint256 _fee) external override {
+        require(msg.sender == feeToSetter, "HexaFinityRouter: FORBIDDEN");
+        swappingFee = _fee;
+    }
+
+    function setSwappingFeeTo(address _feeTo) external override {
+        require(msg.sender == feeToSetter, "HexaFinityRouter: FORBIDDEN");
+        swappingFeeTo = _feeTo;
+    }
+
+    function setFeeToSetter(address _feeToSetter) external override {
+        require(msg.sender == feeToSetter, "HexaFinityRouter: FORBIDDEN");
+        feeToSetter = _feeToSetter;
     }
 }

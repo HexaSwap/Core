@@ -48,4 +48,16 @@ interface IHexaFinityRouter02 is IHexaFinityRouter01 {
         address to,
         uint256 deadline
     ) external;
+
+    function swappingFee() external view returns (uint256);
+
+    function swappingFeeTo() external view returns (address);
+
+    function feeToSetter() external view returns (address);
+
+    function setSwappingFee(uint256) external;
+
+    function setSwappingFeeTo(address) external;
+
+    function setFeeToSetter(address) external;
 }
