@@ -1,23 +1,31 @@
 /* eslint-disable node/no-missing-import */
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle';
 import { BigNumber, constants, Contract } from 'ethers';
-import { ethers } from 'hardhat';
-import { SignerWithAddress } from 'hardhat-deploy-ethers/signers';
-import { expandTo18Decimals } from '../utils';
+import { encodePrice, expandTo18Decimals, mineBlock } from '../shared/utilities';
+import { coreFixture } from '../shared/fixtures';
 
-import HexaFinityPair from '../../artifacts/src/exchange-protocol/HexaFinityPair.sol/HexaFinityPair.json';
+chai.use(solidity);
 
 const { AddressZero } = constants;
 const MINIMUM_LIQUIDITY = BigNumber.from(10).pow(3);
 
 describe('HexaFinityPair contract', () => {
+  const provider = new MockProvider({
+    ganacheOptions: {
+      hardfork: 'istanbul',
+      mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+      gasLimit: 9999999,
+    },
+  });
+
+  const [owner, other] = provider.getWallets();
+  const loadFixture = createFixtureLoader([owner], provider);
+
   let factory: Contract;
   let token0: Contract;
   let token1: Contract;
   let pair: Contract;
-  let owner: SignerWithAddress;
-  let feeToSetter: SignerWithAddress;
-  let other: SignerWithAddress;
 
   const overrides = {
     gasLimit: 9999999,
@@ -26,24 +34,11 @@ describe('HexaFinityPair contract', () => {
   // `beforeEach` will run before each test, re-deploying the contract every
   // time. It receives a callback, which can be async.
   beforeEach(async () => {
-    const HexaFinityFactory = await ethers.getContractFactory('HexaFinityFactory');
-    const ERC20 = await ethers.getContractFactory('HERC20');
-    [owner, feeToSetter, other] = await ethers.getSigners();
-
-    // To deploy our contract, we just have to call Token.deploy() and await
-    // for it to be deployed(), which happens once its transaction has been
-    // mined.
-    factory = await HexaFinityFactory.deploy(feeToSetter.address, overrides);
-    const tokenA = await ERC20.deploy(expandTo18Decimals(10000), overrides);
-    const tokenB = await ERC20.deploy(expandTo18Decimals(10000), overrides);
-
-    await factory.createPair(tokenA.address, tokenB.address, overrides);
-    const pairAddress = await factory.getPair(tokenA.address, tokenB.address);
-    pair = new Contract(pairAddress, JSON.stringify(HexaFinityPair.abi), ethers.provider).connect(owner);
-
-    const token0Address = await pair.token0();
-    token0 = tokenA.address === token0Address ? tokenA : tokenB;
-    token1 = tokenA.address === token0Address ? tokenB : tokenA;
+    const fixture = await loadFixture(coreFixture);
+    factory = fixture.factory;
+    token0 = fixture.token0;
+    token1 = fixture.token1;
+    pair = fixture.pair;
   });
 
   describe('mint', () => {
@@ -187,16 +182,16 @@ describe('HexaFinityPair contract', () => {
       await addLiquidity(token0Amount, token1Amount);
 
       // ensure that setting price{0,1}CumulativeLast for the first time doesn't affect our gas math
-      // await mineBlock(ethers.provider, (await ethers.provider.getBlock('latest')).timestamp + 1);
+      await mineBlock(provider, (await provider.getBlock('latest')).timestamp + 1);
       await pair.sync(overrides);
 
       const swapAmount = expandTo18Decimals(1);
       const expectedOutputAmount = BigNumber.from('453305446940074565');
       await token1.transfer(pair.address, swapAmount);
-      // await mineBlock(ethers.provider, (await ethers.provider.getBlock('latest')).timestamp + 1);
+      await mineBlock(provider, (await provider.getBlock('latest')).timestamp + 1);
       const tx = await pair.swap(expectedOutputAmount, 0, owner.address, '0x', overrides);
       const receipt = await tx.wait();
-      expect(receipt.gasUsed).to.eq(73162);
+      expect(receipt.gasUsed).to.eq(73462);
     });
   });
 
@@ -231,40 +226,40 @@ describe('HexaFinityPair contract', () => {
     });
   });
 
-  // describe('price{0,1}', () => {
-  //   it('price{0,1}CumulativeLast', async () => {
-  //     const token0Amount = expandTo18Decimals(3);
-  //     const token1Amount = expandTo18Decimals(3);
-  //     await addLiquidity(token0Amount, token1Amount);
+  describe('price{0,1}', () => {
+    it('price{0,1}CumulativeLast', async () => {
+      const token0Amount = expandTo18Decimals(3);
+      const token1Amount = expandTo18Decimals(3);
+      await addLiquidity(token0Amount, token1Amount);
 
-  //     const blockTimestamp = (await pair.getReserves())[2];
-  //     // await mineBlock(provider, blockTimestamp + 1);
-  //     await pair.sync(overrides);
+      const blockTimestamp = (await pair.getReserves())[2];
+      await mineBlock(provider, blockTimestamp + 1);
+      await pair.sync(overrides);
 
-  //     const initialPrice = encodePrice(token0Amount, token1Amount);
-  //     expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0]);
-  //     expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1]);
-  //     expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 1);
+      const initialPrice = encodePrice(token0Amount, token1Amount);
+      expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0]);
+      expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1]);
+      expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 1);
 
-  //     const swapAmount = expandTo18Decimals(3);
-  //     await token0.transfer(pair.address, swapAmount);
-  //     // await mineBlock(provider, blockTimestamp + 10);
-  //     // swap to a new price eagerly instead of syncing
-  //     await pair.swap(0, expandTo18Decimals(1), owner.address, '0x', overrides); // make the price nice
+      const swapAmount = expandTo18Decimals(3);
+      await token0.transfer(pair.address, swapAmount);
+      await mineBlock(provider, blockTimestamp + 10);
+      // swap to a new price eagerly instead of syncing
+      await pair.swap(0, expandTo18Decimals(1), owner.address, '0x', overrides); // make the price nice
 
-  //     expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10));
-  //     expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10));
-  //     expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 10);
+      expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10));
+      expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10));
+      expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 10);
 
-  //     // await mineBlock(provider, blockTimestamp + 20);
-  //     await pair.sync(overrides);
+      await mineBlock(provider, blockTimestamp + 20);
+      await pair.sync(overrides);
 
-  //     const newPrice = encodePrice(expandTo18Decimals(6), expandTo18Decimals(2));
-  //     expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10).add(newPrice[0].mul(10)));
-  //     expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10).add(newPrice[1].mul(10)));
-  //     expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 20);
-  //   });
-  // });
+      const newPrice = encodePrice(expandTo18Decimals(6), expandTo18Decimals(2));
+      expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10).add(newPrice[0].mul(10)));
+      expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10).add(newPrice[1].mul(10)));
+      expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 20);
+    });
+  });
 
   describe('feeTo', () => {
     it('feeTo:off', async () => {
@@ -284,7 +279,7 @@ describe('HexaFinityPair contract', () => {
     });
 
     it('feeTo:on', async () => {
-      await factory.connect(feeToSetter).setFeeTo(other.address);
+      await factory.setFeeTo(other.address);
 
       const token0Amount = expandTo18Decimals(1000);
       const token1Amount = expandTo18Decimals(1000);

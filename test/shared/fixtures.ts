@@ -5,7 +5,7 @@ import { expandTo18Decimals } from './utilities';
 
 import HexaFinityFactory from '../../artifacts/src/exchange-protocol/HexaFinityFactory.sol/HexaFinityFactory.json';
 import HexaFinityRouter from '../../artifacts/src/exchange-protocol/HexaFinityRouter.sol/HexaFinityRouter.json';
-import IHexaFinityPair from '../../artifacts/src/exchange-protocol/interfaces/IHexaFinityPair.sol/IHexaFinityPair.json';
+import HexaFinityPair from '../../artifacts/src/exchange-protocol/HexaFinityPair.sol/HexaFinityPair.json';
 import RouterEventEmitter from '../../artifacts/src/exchange-protocol/test/RouterEventEmitter.sol/RouterEventEmitter.json';
 import HERC20 from '../../artifacts/src/exchange-protocol/test/HERC20.sol/HERC20.json';
 import WETH9 from '../../artifacts/src/exchange-protocol/test/WETH9.sol/WETH9.json';
@@ -50,7 +50,7 @@ export async function coreFixture([wallet]: Wallet[], provider: providers.Web3Pr
   // initialize factory
   await factory.createPair(tokenA.address, tokenB.address);
   const pairAddress = await factory.getPair(tokenA.address, tokenB.address);
-  const pair = new Contract(pairAddress, JSON.stringify(IHexaFinityPair.abi), provider).connect(wallet);
+  const pair = new Contract(pairAddress, JSON.stringify(HexaFinityPair.abi), provider).connect(wallet);
 
   const token0Address = await pair.token0();
   const token0 = tokenA.address === token0Address ? tokenA : tokenB;
@@ -58,7 +58,7 @@ export async function coreFixture([wallet]: Wallet[], provider: providers.Web3Pr
 
   await factory.createPair(WETH.address, WETHPartner.address);
   const WETHPairAddress = await factory.getPair(WETH.address, WETHPartner.address);
-  const WETHPair = new Contract(WETHPairAddress, JSON.stringify(IHexaFinityPair.abi), provider).connect(wallet);
+  const WETHPair = new Contract(WETHPairAddress, JSON.stringify(HexaFinityPair.abi), provider).connect(wallet);
 
   return {
     token0,

@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { constants, Contract, ContractFactory } from 'ethers';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from 'hardhat-deploy-ethers/signers';
-import { expandTo18Decimals } from '../utils';
+import { expandTo18Decimals } from '../shared/utilities';
 
 describe('BEP20 Token contract', () => {
   const TOKEN_NAME = 'TEST BEP20';

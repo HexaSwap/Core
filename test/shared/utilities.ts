@@ -75,16 +75,14 @@ export async function getApprovalDigest(
 export async function mineBlock(provider: providers.Web3Provider, timestamp: number): Promise<void> {
   // eslint-disable-next-line no-async-promise-executor
   await new Promise(async (resolve, reject) => {
-    (provider.send as any)(
-      { jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
-      (error: any, result: any): void => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      },
-    );
+    provider
+      .send('evm_mine', [timestamp])
+      .then((result) => {
+        resolve(result);
+      })
+      .catch((error) => {
+        reject(error);
+      });
   });
 }
 
