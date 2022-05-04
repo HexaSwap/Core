@@ -1,7 +1,7 @@
 /* eslint-disable node/no-missing-import */
 import { Wallet, Contract, providers } from 'ethers';
 import { deployContract } from 'ethereum-waffle';
-import { expandTo18Decimals } from './utilities';
+import { expandTo18Decimals, overrides } from './utilities';
 
 import HexaFinityFactory from '../../artifacts/src/exchange-protocol/HexaFinityFactory.sol/HexaFinityFactory.json';
 import HexaFinityRouter from '../../artifacts/src/exchange-protocol/HexaFinityRouter.sol/HexaFinityRouter.json';
@@ -9,10 +9,6 @@ import HexaFinityPair from '../../artifacts/src/exchange-protocol/HexaFinityPair
 import RouterEventEmitter from '../../artifacts/src/exchange-protocol/test/RouterEventEmitter.sol/RouterEventEmitter.json';
 import HERC20 from '../../artifacts/src/exchange-protocol/test/HERC20.sol/HERC20.json';
 import WETH9 from '../../artifacts/src/exchange-protocol/test/WETH9.sol/WETH9.json';
-
-const overrides = {
-  gasLimit: 9999999,
-};
 
 interface CoreFixture {
   token0: Contract;

@@ -2,13 +2,12 @@
 import chai, { expect } from 'chai';
 import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle';
 import { BigNumber, constants, Contract } from 'ethers';
-import { encodePrice, expandTo18Decimals, mineBlock } from '../shared/utilities';
+import { encodePrice, expandTo18Decimals, mineBlock, MINIMUM_LIQUIDITY, overrides } from '../shared/utilities';
 import { coreFixture } from '../shared/fixtures';
 
 chai.use(solidity);
 
 const { AddressZero } = constants;
-const MINIMUM_LIQUIDITY = BigNumber.from(10).pow(3);
 
 describe('HexaFinityPair contract', () => {
   const provider = new MockProvider({
@@ -26,10 +25,6 @@ describe('HexaFinityPair contract', () => {
   let token0: Contract;
   let token1: Contract;
   let pair: Contract;
-
-  const overrides = {
-    gasLimit: 9999999,
-  };
 
   // `beforeEach` will run before each test, re-deploying the contract every
   // time. It receives a callback, which can be async.
@@ -191,7 +186,7 @@ describe('HexaFinityPair contract', () => {
       await mineBlock(provider, (await provider.getBlock('latest')).timestamp + 1);
       const tx = await pair.swap(expectedOutputAmount, 0, owner.address, '0x', overrides);
       const receipt = await tx.wait();
-      expect(receipt.gasUsed).to.eq(73462);
+      expect(receipt.gasUsed).to.eq(73674);
     });
   });
 
