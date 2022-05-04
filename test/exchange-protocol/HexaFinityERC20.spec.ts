@@ -1,34 +1,36 @@
-import { expect } from 'chai';
+/* eslint-disable node/no-missing-import */
+import chai, { expect } from 'chai';
+import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle';
 import { constants, Contract } from 'ethers';
-import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { ethers } from 'hardhat';
-import { SignerWithAddress } from 'hardhat-deploy-ethers/signers';
-import { expandTo18Decimals } from '../utils';
+import { defaultAbiCoder, keccak256, toUtf8Bytes } from 'ethers/lib/utils';
+import { coreFixture } from '../shared/fixtures';
+import { expandTo18Decimals } from '../shared/utilities';
+
+chai.use(solidity);
 
 const TOTAL_SUPPLY = expandTo18Decimals(10000);
 const TEST_AMOUNT1 = expandTo18Decimals(50);
 const TEST_AMOUNT2 = expandTo18Decimals(100);
-const overrides = {
-  gasLimit: 9999999,
-};
 
 describe('HexaFinityERC20', () => {
+  const provider = new MockProvider({
+    ganacheOptions: {
+      hardfork: 'istanbul',
+      mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
+      gasLimit: 9999999,
+    },
+  });
+
+  const [owner, addr1, addr2] = provider.getWallets();
+  const loadFixture = createFixtureLoader([owner], provider);
+
   let token: Contract;
-  let owner: SignerWithAddress;
-  let addr1: SignerWithAddress;
-  let addr2: SignerWithAddress;
 
   // `beforeEach` will run before each test, re-deploying the contract every
   // time. It receives a callback, which can be async.
   beforeEach(async () => {
-    // Get the ContractFactory and Signers here.
-    const HERC20 = await ethers.getContractFactory('HERC20');
-    [owner, addr1, addr2] = await ethers.getSigners();
-
-    // To deploy our contract, we just have to call Token.deploy() and await
-    // for it to be deployed(), which happens once its transaction has been
-    // mined.
-    token = await HERC20.deploy(TOTAL_SUPPLY, overrides);
+    const fixture = await loadFixture(coreFixture);
+    token = fixture.token0;
   });
 
   describe('Deployment', () => {
@@ -52,25 +54,25 @@ describe('HexaFinityERC20', () => {
       expect(await token.balanceOf(owner.address)).to.eq(TOTAL_SUPPLY);
     });
 
-    // it('DOMAIN_SEPARATOR', async () => {
-    //   const name = await token.name();
-    //   expect(await token.DOMAIN_SEPARATOR()).to.eq(
-    //     keccak256(
-    //       defaultAbiCoder.encode(
-    //         ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
-    //         [
-    //           keccak256(
-    //             toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
-    //           ),
-    //           keccak256(toUtf8Bytes(name)),
-    //           keccak256(toUtf8Bytes('1')),
-    //           1,
-    //           token.address,
-    //         ],
-    //       ),
-    //     ),
-    //   );
-    // });
+    it('DOMAIN_SEPARATOR', async () => {
+      const name = await token.name();
+      expect(await token.DOMAIN_SEPARATOR()).to.eq(
+        keccak256(
+          defaultAbiCoder.encode(
+            ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
+            [
+              keccak256(
+                toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
+              ),
+              keccak256(toUtf8Bytes(name)),
+              keccak256(toUtf8Bytes('1')),
+              1,
+              token.address,
+            ],
+          ),
+        ),
+      );
+    });
 
     it('PERMIT_TYPEHASH', async () => {
       expect(await token.PERMIT_TYPEHASH()).to.eq(

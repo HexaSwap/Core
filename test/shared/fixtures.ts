@@ -26,7 +26,7 @@ interface CoreFixture {
   WETHPair: Contract;
 }
 
-export async function coreFixture(provider: providers.Web3Provider, [wallet]: Wallet[]): Promise<CoreFixture> {
+export async function coreFixture([wallet]: Wallet[], provider: providers.Web3Provider): Promise<CoreFixture> {
   // deploy tokens
   const tokenA = await deployContract(wallet, HERC20, [expandTo18Decimals(10000)]);
   const tokenB = await deployContract(wallet, HERC20, [expandTo18Decimals(10000)]);
