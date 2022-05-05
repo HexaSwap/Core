@@ -3,7 +3,7 @@
 import { HardhatUserConfig } from 'hardhat/types';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
-import { node_url, accounts } from '../../utils/network';
+import { node_url, accounts } from '../utils/network';
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
