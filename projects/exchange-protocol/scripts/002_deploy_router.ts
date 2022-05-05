@@ -1,8 +1,6 @@
-import { ethers, network, run } from 'hardhat';
+import { network, run } from 'hardhat';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
-
-import contracts from '../../utils/contracts';
 
 export const ROUTER_DID = 'ROUTER_DID';
 
