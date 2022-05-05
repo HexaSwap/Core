@@ -40,7 +40,6 @@ describe('HexaFinityFactory contract', () => {
 
   describe('Deployment', () => {
     it('feeTo, feeToSetter, allPairsLength', async () => {
-      console.log('-----------------------', await factory.INIT_CODE_PAIR_HASH());
       // feeTo should be zero address
       expect(await factory.feeTo()).to.eq(constants.AddressZero);
       // feeToSetter should be same when set in constructor
