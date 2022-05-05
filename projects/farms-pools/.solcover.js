@@ -10,7 +10,7 @@ module.exports = {
     "libs/MockERC20.sol",
     "libs/WBNB.sol",
     "BnbStaking.sol",
-    "CakeToken.sol",
+    "HexaToken.sol",
     "LotteryRewardPool.sol",
     "MasterChef.sol",
     "SousChef.sol",

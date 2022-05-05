@@ -44,11 +44,6 @@ const config: HardhatUserConfig = {
     cache: "./cache",
     artifacts: "./artifacts",
   },
-  abiExporter: {
-    path: "./data/abi",
-    clear: true,
-    flat: false,
-  },
 };
 
 export default config;
