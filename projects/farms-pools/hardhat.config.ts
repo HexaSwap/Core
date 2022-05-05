@@ -1,43 +1,39 @@
-/* eslint-disable camelcase */
-/* eslint-disable node/no-missing-import */
-import { HardhatUserConfig } from 'hardhat/types';
-import 'hardhat-deploy';
-import 'hardhat-deploy-ethers';
-import { node_url, accounts } from '../../utils/network';
+import type { HardhatUserConfig, NetworkUserConfig } from "hardhat/types";
+import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-web3";
+import "@nomiclabs/hardhat-truffle5";
+import "hardhat-abi-exporter";
+import "hardhat-contract-sizer";
+import "solidity-coverage";
+import "dotenv/config";
+
+const bscTestnet: NetworkUserConfig = {
+  url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+  chainId: 97,
+  accounts: [process.env.KEY_TESTNET!],
+};
+
+const bscMainnet: NetworkUserConfig = {
+  url: "https://bsc-dataseed.binance.org/",
+  chainId: 56,
+  accounts: [process.env.KEY_MAINNET!],
+};
 
 const config: HardhatUserConfig = {
-  defaultNetwork: 'hardhat',
-  solidity: {
-    compilers: [
-      {
-        version: '0.6.12',
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 99999,
-          },
-        },
-      },
-    ],
-  },
+  defaultNetwork: "hardhat",
   networks: {
-    staging: {
-      url: node_url('testnet'),
-      accounts: accounts('testnet'),
-    },
-    production: {
-      url: node_url('mainnet'),
-      accounts: accounts('mainnet'),
-    },
+    hardhat: {},
+    // testnet: bscTestnet,
+    // mainnet: bscMainnet,
   },
-  namedAccounts: {
-    deployer: 0,
-    dev: 1,
-    feeSetter: 2,
-    Admin: 3,
-    operator: 4,
-    treasury: 5,
-    injector: 6,
+  solidity: {
+    version: "0.6.12",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 99999,
+      },
+    },
   },
   paths: {
     sources: "./contracts",
@@ -46,4 +42,5 @@ const config: HardhatUserConfig = {
     artifacts: "./artifacts",
   },
 };
+
 export default config;

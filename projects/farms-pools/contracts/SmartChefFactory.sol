@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-import "../oldOpenzeppelin/contracts/access/Ownable.sol";
-import "../bsc-library/IBEP20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "bsc-library/contracts/IBEP20.sol";
 
 import "./SmartChefInitializable.sol";
 
@@ -35,7 +35,7 @@ contract SmartChefFactory is Ownable {
     ) external onlyOwner {
         require(_stakedToken.totalSupply() >= 0);
         require(_rewardToken.totalSupply() >= 0);
-        require(_stakedToken != _rewardToken, "Tokens must be be different");
+        require(_stakedToken != _rewardToken, "SmartChefFactory: Tokens must be different");
 
         bytes memory bytecode = type(SmartChefInitializable).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(_stakedToken, _rewardToken, _startBlock));

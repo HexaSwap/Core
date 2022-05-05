@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-import "../oldOpenzeppelin/contracts/access/Ownable.sol";
-import "../oldOpenzeppelin/contracts/math/SafeMath.sol";
-import "../oldOpenzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import "../bsc-library/IBEP20.sol";
-import "../bsc-library/SafeBEP20.sol";
+import "bsc-library/contracts/IBEP20.sol";
+import "bsc-library/contracts/SafeBEP20.sol";
 
 contract SmartChef is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
@@ -78,7 +78,7 @@ contract SmartChef is Ownable, ReentrancyGuard {
     ) public {
         require(_stakedToken.totalSupply() >= 0);
         require(_rewardToken.totalSupply() >= 0);
-        require(_stakedToken != _rewardToken, "Tokens must be be different");
+        require(_stakedToken != _rewardToken, "SmartChef: Tokens must be be different");
 
         stakedToken = _stakedToken;
         rewardToken = _rewardToken;
