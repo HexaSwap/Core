@@ -10,8 +10,8 @@
     "projects/**"
   ],
   "scripts": {
-    "format:check": "prettier --check 'projects/**/*.{js,ts,sol}'",
-    "format:write": "prettier --write 'projects/**/*.{js,ts,sol}'",
+    "format:check": "prettier --check 'projects/**/*.{js,ts}'",
+    "format:write": "prettier --write 'projects/**/*.{js,ts}'",
     "prepare": "husky install",
     "test": "lerna run test"
   },

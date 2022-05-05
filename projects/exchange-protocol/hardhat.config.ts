@@ -76,10 +76,10 @@ const config: HardhatUserConfig = {
     injector: 6,
   },
   paths: {
-    sources: "./contracts",
-    tests: "./test",
-    cache: "./cache",
-    artifacts: "./artifacts",
+    sources: './contracts',
+    tests: './test',
+    cache: './cache',
+    artifacts: './artifacts',
   },
 };
 export default config;
