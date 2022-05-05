@@ -17,7 +17,7 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
   let rewardPerBlock = parseEther("10");
 
   // Contracts
-  let mockCAKE, mockPT, smartChef, smartChefFactory;
+  let mockHexa, mockPT, smartChef, smartChefFactory;
 
   // Generic result variable
   let result: any;
@@ -27,7 +27,7 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
     startBlock = new BN(blockNumber).add(new BN(100));
     endBlock = new BN(blockNumber).add(new BN(500));
 
-    mockCAKE = await MockBEP20.new("Mock CAKE", "CAKE", parseEther("1000000"), {
+    mockHexa = await MockBEP20.new("Mock Hexa", "HEXA", parseEther("1000000"), {
       from: alice,
     });
 
@@ -41,7 +41,7 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
   describe("SMART CHEF #1 - NO POOL LIMIT", async () => {
     it("Deploy pool with SmartChefFactory", async () => {
       result = await smartChefFactory.deployPool(
-        mockCAKE.address,
+        mockHexa.address,
         mockPT.address,
         rewardPerBlock,
         startBlock,
@@ -73,8 +73,8 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
 
     it("Users deposit", async () => {
       for (let thisUser of [bob, carol, david, erin]) {
-        await mockCAKE.mintTokens(parseEther("1000"), { from: thisUser });
-        await mockCAKE.approve(smartChef.address, parseEther("1000"), {
+        await mockHexa.mintTokens(parseEther("1000"), { from: thisUser });
+        await mockHexa.approve(smartChef.address, parseEther("1000"), {
           from: thisUser,
         });
         result = await smartChef.deposit(parseEther("100"), { from: thisUser });
@@ -146,7 +146,7 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
     it("Cannot deploy a pool with SmartChefFactory if not owner", async () => {
       await expectRevert(
         smartChefFactory.deployPool(
-          mockCAKE.address,
+          mockHexa.address,
           mockPT.address,
           rewardPerBlock,
           startBlock,
@@ -162,8 +162,8 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
     it("Cannot deploy a pool with wrong tokens", async () => {
       await expectRevert(
         smartChefFactory.deployPool(
-          mockCAKE.address,
-          mockCAKE.address,
+          mockHexa.address,
+          mockHexa.address,
           rewardPerBlock,
           startBlock,
           endBlock,
@@ -171,12 +171,12 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
           alice,
           { from: alice }
         ),
-        "Tokens must be be different"
+        "SmartChefFactory: Tokens must be different"
       );
 
       await expectRevert(
         smartChefFactory.deployPool(
-          mockCAKE.address,
+          mockHexa.address,
           smartChef.address,
           rewardPerBlock,
           startBlock,
@@ -191,7 +191,7 @@ contract("Smart Chef Factory", ([alice, bob, carol, david, erin, ...accounts]) =
       await expectRevert(
         smartChefFactory.deployPool(
           alice,
-          mockCAKE.address,
+          mockHexa.address,
           rewardPerBlock,
           startBlock,
           endBlock,

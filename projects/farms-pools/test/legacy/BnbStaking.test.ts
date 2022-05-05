@@ -2,7 +2,7 @@ import { expectRevert, time } from "@openzeppelin/test-helpers";
 import { artifacts, contract } from "hardhat";
 import { assert } from "chai";
 
-const CakeToken = artifacts.require("CakeToken");
+const HexaToken = artifacts.require("HexaToken");
 const BnbStaking = artifacts.require("BnbStaking");
 const WBNB = artifacts.require("libs/WBNB");
 
@@ -10,7 +10,7 @@ contract("BNB Staking", async ([alice, bob, admin, dev, minter]) => {
   let rewardToken, wBNB, bnbChef;
 
   beforeEach(async () => {
-    rewardToken = await CakeToken.new({ from: minter });
+    rewardToken = await HexaToken.new({ from: minter });
     wBNB = await WBNB.new({ from: minter });
     bnbChef = await BnbStaking.new(wBNB.address, rewardToken.address, 1000, 10, 1010, admin, wBNB.address, {
       from: minter,

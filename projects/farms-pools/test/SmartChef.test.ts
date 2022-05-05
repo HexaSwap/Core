@@ -10,7 +10,7 @@ const SmartChef = artifacts.require("./SmartChef.sol");
 
 contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts]) => {
   // Contracts
-  let mockCAKE, mockPT, smartChef, smartChef2;
+  let mockHexa, mockPT, smartChef, smartChef2;
 
   let blockNumber;
 
@@ -28,7 +28,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
     startBlock = new BN(blockNumber).add(new BN(100));
     endBlock = new BN(blockNumber).add(new BN(500));
 
-    mockCAKE = await MockBEP20.new("Mock CAKE", "CAKE", parseEther("1000000"), {
+    mockHexa = await MockBEP20.new("Mock Hexa", "HEXA", parseEther("1000000"), {
       from: alice,
     });
 
@@ -37,7 +37,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
     });
 
     smartChef = await SmartChef.new(
-      mockCAKE.address,
+      mockHexa.address,
       mockPT.address,
       rewardPerBlock,
       startBlock,
@@ -62,8 +62,8 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
 
     it("Users deposit", async () => {
       for (let thisUser of [bob, carol, david, erin]) {
-        await mockCAKE.mintTokens(parseEther("1000"), { from: thisUser });
-        await mockCAKE.approve(smartChef.address, parseEther("1000"), {
+        await mockHexa.mintTokens(parseEther("1000"), { from: thisUser });
+        await mockHexa.approve(smartChef.address, parseEther("1000"), {
           from: thisUser,
         });
         result = await smartChef.deposit(parseEther("100"), { from: thisUser });
@@ -145,7 +145,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
       poolLimitPerUser = parseEther("2");
 
       smartChef2 = await SmartChef.new(
-        mockCAKE.address,
+        mockHexa.address,
         mockPT.address,
         rewardPerBlock,
         startBlock,
@@ -204,7 +204,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
     });
 
     it("User cannot deposit more than limit", async () => {
-      await mockCAKE.approve(smartChef2.address, parseEther("100"), {
+      await mockHexa.approve(smartChef2.address, parseEther("100"), {
         from: bob,
       });
       await smartChef2.deposit(parseEther("1"), { from: bob });
@@ -214,7 +214,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
 
     it("Users deposit", async () => {
       for (let thisUser of [carol, david, erin]) {
-        await mockCAKE.approve(smartChef2.address, parseEther("100"), {
+        await mockHexa.approve(smartChef2.address, parseEther("100"), {
           from: thisUser,
         });
         result = await smartChef2.deposit(parseEther("2"), { from: thisUser });
@@ -233,7 +233,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
       assert.equal(String(await smartChef2.pendingReward(bob)), parseEther("62.5").toString());
     });
 
-    it("Admin changes the limit to 10 CAKE tokens", async () => {
+    it("Admin changes the limit to 10 HEXA tokens", async () => {
       assert.equal(await smartChef2.hasUserLimit(), true);
       result = await smartChef2.updatePoolLimitPerUser(true, parseEther("10"), { from: alice });
       expectEvent(result, "NewPoolLimit", { poolLimitPerUser: parseEther("10").toString() });
@@ -254,7 +254,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
       assert.equal(String(await smartChef2.pendingReward(bob)), parseEther("0").toString());
     });
 
-    it("Admin cannot reduce the limit to 5 CAKE tokens", async () => {
+    it("Admin cannot reduce the limit to 5 HEXA tokens", async () => {
       await expectRevert(
         smartChef2.updatePoolLimitPerUser(true, parseEther("5"), { from: alice }),
         "New limit must be higher"
@@ -298,7 +298,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
       poolLimitPerUser = parseEther("2");
 
       smartChef = await SmartChef.new(
-        mockCAKE.address,
+        mockHexa.address,
         mockPT2.address,
         rewardPerBlock,
         startBlock,
@@ -315,7 +315,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
       });
 
       smartChef = await SmartChef.new(
-        mockCAKE.address,
+        mockHexa.address,
         mockPT2.address,
         rewardPerBlock,
         startBlock,
@@ -333,7 +333,7 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
       });
 
       smartChef = await SmartChef.new(
-        mockCAKE.address,
+        mockHexa.address,
         mockPT2.address,
         rewardPerBlock,
         startBlock,
@@ -351,27 +351,27 @@ contract("Smart Chef V2", ([alice, bob, carol, david, erin, frank, ...accounts])
       });
 
       await expectRevert(
-        SmartChef.new(mockCAKE.address, mockPT2.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser),
+        SmartChef.new(mockHexa.address, mockPT2.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser),
         "Must be inferior to 30"
       );
     });
     it("Cannot deploy a pool with wrong tokens", async () => {
       await expectRevert(
-        SmartChef.new(mockCAKE.address, mockCAKE.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser, {
+        SmartChef.new(mockHexa.address, mockHexa.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser, {
           from: alice,
         }),
-        "Tokens must be be different"
+        "SmartChef: Tokens must be be different"
       );
 
       await expectRevert(
-        SmartChef.new(mockCAKE.address, smartChef.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser, {
+        SmartChef.new(mockHexa.address, smartChef.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser, {
           from: alice,
         }),
         "function selector was not recognized and there's no fallback function"
       );
 
       await expectRevert(
-        SmartChef.new(alice, mockCAKE.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser, { from: alice }),
+        SmartChef.new(alice, mockHexa.address, rewardPerBlock, startBlock, endBlock, poolLimitPerUser, { from: alice }),
         "function call to a non-contract account"
       );
     });

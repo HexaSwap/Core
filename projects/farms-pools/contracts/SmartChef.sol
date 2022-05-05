@@ -78,7 +78,7 @@ contract SmartChef is Ownable, ReentrancyGuard {
     ) public {
         require(_stakedToken.totalSupply() >= 0);
         require(_rewardToken.totalSupply() >= 0);
-        require(_stakedToken != _rewardToken, "Tokens must be be different");
+        require(_stakedToken != _rewardToken, "SmartChef: Tokens must be be different");
 
         stakedToken = _stakedToken;
         rewardToken = _rewardToken;
