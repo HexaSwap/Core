@@ -15,15 +15,19 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
 
     address public immutable override factory;
     address public immutable override WETH;
+    address public override feeToSetter;
+    address public override swappingFeeTo;
+    uint256 public override swappingFee;
 
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, "HexaFinityRouter: EXPIRED");
         _;
     }
 
-    constructor(address _factory, address _WETH) public {
+    constructor(address _factory, address _WETH, address _feeToSetter) public {
         factory = _factory;
         WETH = _WETH;
+        feeToSetter = _feeToSetter;
     }
 
     receive() external payable {
@@ -241,6 +245,31 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         );
     }
 
+    function _transferSwappingFee(
+        address token,
+        uint256 amount
+    ) internal virtual returns (uint256 amountAdjusted) {
+        if (swappingFeeTo != address(0) && swappingFee > 0) {
+            uint256 fee_amount = amount.mul(swappingFee).div(10000);
+            TransferHelper.safeTransfer(token, swappingFeeTo, fee_amount);
+            amountAdjusted = amount.sub(fee_amount);
+        } else {
+            amountAdjusted = amount;
+        }
+    }
+
+    function _transferETHSwappingFee(
+        uint256 amount
+    ) internal virtual returns (uint256 amountAdjusted) {
+        if (swappingFeeTo != address(0) && swappingFee > 0) {
+            uint256 fee_amount = amount.mul(swappingFee).div(10000);
+            TransferHelper.safeTransferETH(swappingFeeTo, fee_amount);
+            amountAdjusted = amount.sub(fee_amount);
+        } else {
+            amountAdjusted = amount;
+        }
+    }
+
     // **** SWAP ****
     // requires the initial amount to have already been sent to the first pair
     function _swap(
@@ -266,7 +295,8 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) returns (uint256[] memory amounts) {
-        amounts = HexaFinityLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 amountInAdjusted = _transferSwappingFee(path[0], amountIn);
+        amounts = HexaFinityLibrary.getAmountsOut(factory, amountInAdjusted, path);
         require(amounts[amounts.length - 1] >= amountOutMin, "HexaFinityRouter: INSUFFICIENT_OUTPUT_AMOUNT");
         TransferHelper.safeTransferFrom(
             path[0],
@@ -284,7 +314,8 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) returns (uint256[] memory amounts) {
-        amounts = HexaFinityLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 amountOutAdjusted = _transferSwappingFee(path[0], amountOut);
+        amounts = HexaFinityLibrary.getAmountsIn(factory, amountOutAdjusted, path);
         require(amounts[0] <= amountInMax, "HexaFinityRouter: EXCESSIVE_INPUT_AMOUNT");
         TransferHelper.safeTransferFrom(
             path[0],
@@ -302,7 +333,8 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         uint256 deadline
     ) external payable virtual override ensure(deadline) returns (uint256[] memory amounts) {
         require(path[0] == WETH, "HexaFinityRouter: INVALID_PATH");
-        amounts = HexaFinityLibrary.getAmountsOut(factory, msg.value, path);
+        uint256 amountAdjusted = _transferETHSwappingFee(msg.value);
+        amounts = HexaFinityLibrary.getAmountsOut(factory, amountAdjusted, path);
         require(amounts[amounts.length - 1] >= amountOutMin, "HexaFinityRouter: INSUFFICIENT_OUTPUT_AMOUNT");
         IWETH(WETH).deposit{value: amounts[0]}();
         assert(IWETH(WETH).transfer(HexaFinityLibrary.pairFor(factory, path[0], path[1]), amounts[0]));
@@ -317,7 +349,8 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         uint256 deadline
     ) external virtual override ensure(deadline) returns (uint256[] memory amounts) {
         require(path[path.length - 1] == WETH, "HexaFinityRouter: INVALID_PATH");
-        amounts = HexaFinityLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 amountOutAdjusted = _transferSwappingFee(path[0], amountOut);
+        amounts = HexaFinityLibrary.getAmountsIn(factory, amountOutAdjusted, path);
         require(amounts[0] <= amountInMax, "HexaFinityRouter: EXCESSIVE_INPUT_AMOUNT");
         TransferHelper.safeTransferFrom(
             path[0],
@@ -338,7 +371,8 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         uint256 deadline
     ) external virtual override ensure(deadline) returns (uint256[] memory amounts) {
         require(path[path.length - 1] == WETH, "HexaFinityRouter: INVALID_PATH");
-        amounts = HexaFinityLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 amountInAdjusted = _transferSwappingFee(path[0], amountIn);
+        amounts = HexaFinityLibrary.getAmountsOut(factory, amountInAdjusted, path);
         require(amounts[amounts.length - 1] >= amountOutMin, "HexaFinityRouter: INSUFFICIENT_OUTPUT_AMOUNT");
         TransferHelper.safeTransferFrom(
             path[0],
@@ -358,7 +392,8 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         uint256 deadline
     ) external payable virtual override ensure(deadline) returns (uint256[] memory amounts) {
         require(path[0] == WETH, "HexaFinityRouter: INVALID_PATH");
-        amounts = HexaFinityLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 amountOutAdjusted = _transferETHSwappingFee(amountOut);
+        amounts = HexaFinityLibrary.getAmountsIn(factory, amountOutAdjusted, path);
         require(amounts[0] <= msg.value, "HexaFinityRouter: EXCESSIVE_INPUT_AMOUNT");
         IWETH(WETH).deposit{value: amounts[0]}();
         assert(IWETH(WETH).transfer(HexaFinityLibrary.pairFor(factory, path[0], path[1]), amounts[0]));
@@ -398,11 +433,12 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) {
+        uint256 amountInAdjusted = _transferSwappingFee(path[0], amountIn);
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,
             HexaFinityLibrary.pairFor(factory, path[0], path[1]),
-            amountIn
+            amountInAdjusted
         );
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
         _swapSupportingFeeOnTransferTokens(path, to);
@@ -419,7 +455,7 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         uint256 deadline
     ) external payable virtual override ensure(deadline) {
         require(path[0] == WETH, "HexaFinityRouter: INVALID_PATH");
-        uint256 amountIn = msg.value;
+        uint256 amountIn = _transferETHSwappingFee(msg.value);
         IWETH(WETH).deposit{value: amountIn}();
         assert(IWETH(WETH).transfer(HexaFinityLibrary.pairFor(factory, path[0], path[1]), amountIn));
         uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
@@ -438,11 +474,12 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         uint256 deadline
     ) external virtual override ensure(deadline) {
         require(path[path.length - 1] == WETH, "HexaFinityRouter: INVALID_PATH");
+        uint256 amountInAdjusted = _transferSwappingFee(path[0], amountIn);
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,
             HexaFinityLibrary.pairFor(factory, path[0], path[1]),
-            amountIn
+            amountInAdjusted
         );
         _swapSupportingFeeOnTransferTokens(path, address(this));
         uint256 amountOut = IERC20(WETH).balanceOf(address(this));
@@ -494,5 +531,20 @@ contract HexaFinityRouter is IHexaFinityRouter02 {
         returns (uint256[] memory amounts)
     {
         return HexaFinityLibrary.getAmountsIn(factory, amountOut, path);
+    }
+
+    function setSwappingFee(uint256 _fee) external override {
+        require(msg.sender == feeToSetter, "HexaFinityRouter: FORBIDDEN");
+        swappingFee = _fee;
+    }
+
+    function setSwappingFeeTo(address _feeTo) external override {
+        require(msg.sender == feeToSetter, "HexaFinityRouter: FORBIDDEN");
+        swappingFeeTo = _feeTo;
+    }
+
+    function setFeeToSetter(address _feeToSetter) external override {
+        require(msg.sender == feeToSetter, "HexaFinityRouter: FORBIDDEN");
+        feeToSetter = _feeToSetter;
     }
 }

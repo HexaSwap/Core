@@ -1,13 +1,16 @@
-import {HardhatUserConfig} from 'hardhat/types';
+/* eslint-disable camelcase */
+/* eslint-disable node/no-missing-import */
+import { HardhatUserConfig } from 'hardhat/types';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
-import {node_url, accounts} from './utils/network';
+import { node_url, accounts } from './utils/network';
 
 const config: HardhatUserConfig = {
+  defaultNetwork: 'hardhat',
   solidity: {
     compilers: [
       {
-        version: "0.8.4",
+        version: '0.8.4',
         settings: {
           optimizer: {
             enabled: true,
@@ -16,7 +19,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: "0.6.12",
+        version: '0.6.12',
         settings: {
           optimizer: {
             enabled: true,
@@ -25,7 +28,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: "0.6.6",
+        version: '0.6.6',
         settings: {
           optimizer: {
             enabled: true,
@@ -34,7 +37,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: "0.5.16",
+        version: '0.5.16',
         settings: {
           optimizer: {
             enabled: true,
@@ -43,7 +46,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: "0.4.18",
+        version: '0.4.18',
         settings: {
           optimizer: {
             enabled: true,

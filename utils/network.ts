@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { BigNumber } from "ethers";
+import { BigNumber } from 'ethers';
 
 export function node_url(networkName: string): string {
   if (networkName) {
@@ -21,9 +21,7 @@ export function node_url(networkName: string): string {
     return '';
   }
   if (uri.indexOf('{{') >= 0) {
-    throw new Error(
-      `invalid uri or network not supported by nod eprovider : ${uri}`
-    );
+    throw new Error(`invalid uri or network not supported by nod eprovider : ${uri}`);
   }
   return uri;
 }
@@ -43,8 +41,8 @@ export function getMnemonic(networkName?: string): string {
   return mnemonic;
 }
 
-export function accounts(networkName?: string): {mnemonic: string} {
-  return {mnemonic: getMnemonic(networkName)};
+export function accounts(networkName?: string): { mnemonic: string } {
+  return { mnemonic: getMnemonic(networkName) };
 }
 export function toWei(qt: number, decimals: number) {
   return String(qt * 10 ** decimals);
@@ -55,14 +53,14 @@ export function toBN(qt: number, decimals: number) {
 }
 
 export function log(...args: string[]) {
-  if (process.env.NODE_ENV !== "test") {
-      console.log(args.join(" "));
+  if (process.env.NODE_ENV !== 'test') {
+    console.log(args.join(' '));
   }
 }
 
 export function ifNotProd(dependencies: string[]) {
-  if (process.env.NODE_ENV === "prod") {
-      return [];
+  if (process.env.NODE_ENV === 'prod') {
+    return [];
   }
   return dependencies;
 }

@@ -1,51 +1,43 @@
-import { network, run } from "hardhat";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {DeployFunction} from "hardhat-deploy/types";
+import { network, run } from 'hardhat';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { DeployFunction } from 'hardhat-deploy/types';
 
-import { MAX_ZAP_REVERSE_RATIO } from "../../utils/config";
+import { MAX_ZAP_REVERSE_RATIO } from '../../utils/config';
 
-export const ZAP_DID = "ZAP_DID";
+export const ZAP_DID = 'ZAP_DID';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Compile contracts
-  await run("compile");
-  console.log("Compiled contracts.");
+  await run('compile');
+  console.log('Compiled contracts.');
 
   const networkName = network.name;
 
-  console.log("Deploying to network:", networkName);
+  console.log('Deploying to network:', networkName);
 
   // Deploy HexaFinityZapV1
-  console.log("Deploying HexaFinityZap V1..");
+  console.log('Deploying HexaFinityZap V1..');
 
-  const {deployments, getNamedAccounts} = hre;
-  const {deploy, get} = deployments;
+  const { deployments, getNamedAccounts } = hre;
+  const { deploy, get } = deployments;
 
-  const {deployer} = await getNamedAccounts();
+  const { deployer } = await getNamedAccounts();
 
-  const wbnb = await get("WBNB");
-  const router = await get("HexaFinityRouter");
+  const wbnb = await get('WBNB');
+  const router = await get('HexaFinityRouter');
 
-  const deployment = await deploy("HexaFinityZapV1", {
+  const deployment = await deploy('HexaFinityZapV1', {
     from: deployer,
-    args: [
-      wbnb.address,
-      router.address,
-      MAX_ZAP_REVERSE_RATIO
-    ],
+    args: [wbnb.address, router.address, MAX_ZAP_REVERSE_RATIO],
     log: true,
   });
 
   try {
-    await run("verify:verify", {
+    await run('verify:verify', {
       address: deployment.address,
-      constructorArguments: [
-        wbnb.address,
-        router.address,
-        MAX_ZAP_REVERSE_RATIO
-      ],
+      constructorArguments: [wbnb.address, router.address, MAX_ZAP_REVERSE_RATIO],
     });
-    console.log("HexaFinityZapV1 verify success");
+    console.log('HexaFinityZapV1 verify success');
   } catch (e) {
     console.log(e);
   }
@@ -53,4 +45,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 export default func;
 func.id = ZAP_DID;
-func.tags = ["local", "testnet", "mainnet", "zap", ZAP_DID];
+func.tags = ['local', 'testnet', 'mainnet', 'zap', ZAP_DID];

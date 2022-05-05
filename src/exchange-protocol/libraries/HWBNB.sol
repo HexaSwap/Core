@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.4.18;
 
-contract WBNB {
+contract HWBNB {
     string public name = "Wrapped BNB";
     string public symbol = "WBNB";
     uint8 public decimals = 18;
