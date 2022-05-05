@@ -4,8 +4,9 @@ import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle';
 import { BigNumber, constants, Contract } from 'ethers';
 import { getCreate2Address } from '../shared/utilities';
 
-import HexaFinityPair from '../../artifacts/src/exchange-protocol/HexaFinityPair.sol/HexaFinityPair.json';
 import { coreFixture } from '../shared/fixtures';
+import { artifacts } from 'hardhat';
+import { Artifact } from 'hardhat/types';
 
 chai.use(solidity);
 
@@ -22,6 +23,7 @@ describe('HexaFinityFactory contract', () => {
   const loadFixture = createFixtureLoader([owner], provider);
 
   let factory: Contract;
+  let HexaFinityPair: Artifact;
 
   const TEST_ADDRESSES: [string, string] = [
     '0x1000000000000000000000000000000000000000',
@@ -33,6 +35,7 @@ describe('HexaFinityFactory contract', () => {
   beforeEach(async () => {
     const fixture = await loadFixture(coreFixture);
     factory = fixture.factoryV2;
+    HexaFinityPair = await artifacts.readArtifact('HexaFinityPair');
   });
 
   describe('Deployment', () => {

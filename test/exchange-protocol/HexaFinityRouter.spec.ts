@@ -3,11 +3,9 @@ import chai, { expect } from 'chai';
 import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle';
 import { BigNumber, constants, Contract } from 'ethers';
 import { ecsign } from 'ethereumjs-util';
-import { expandTo18Decimals, getApprovalDigest, mineBlock, MINIMUM_LIQUIDITY, overrides } from '../shared/utilities';
+import { expandTo18Decimals, getApprovalDigest, MINIMUM_LIQUIDITY, overrides } from '../shared/utilities';
 import { coreFixture } from '../shared/fixtures';
-
-import DeflatingERC20 from '../../artifacts/src/exchange-protocol/test/DeflatingERC20.sol/DeflatingERC20.json';
-import IHexaFinityPair from '../../artifacts/src/exchange-protocol/HexaFinityPair.sol/HexaFinityPair.json';
+import { artifacts } from 'hardhat';
 
 chai.use(solidity);
 
@@ -160,6 +158,8 @@ describe('HexaFinityRouter: fee-on-transfer tokens', () => {
   let pair: Contract;
   beforeEach(async function () {
     const fixture = await loadFixture(coreFixture);
+    const DeflatingERC20 = await artifacts.readArtifact('DeflatingERC20');
+    const HexaFinityPair = await artifacts.readArtifact('HexaFinityPair');
 
     WETH = fixture.WETH;
     router = fixture.router02;
@@ -169,7 +169,7 @@ describe('HexaFinityRouter: fee-on-transfer tokens', () => {
     // make a DTT<>WETH pair
     await fixture.factoryV2.createPair(DTT.address, WETH.address);
     const pairAddress = await fixture.factoryV2.getPair(DTT.address, WETH.address);
-    pair = new Contract(pairAddress, JSON.stringify(IHexaFinityPair.abi), provider).connect(wallet);
+    pair = new Contract(pairAddress, JSON.stringify(HexaFinityPair.abi), provider).connect(wallet);
   });
 
   afterEach(async function () {
@@ -340,7 +340,7 @@ describe('HexaFinityRouter: fee-on-transfer tokens: reloaded', () => {
   let router: Contract;
   beforeEach(async function () {
     const fixture = await loadFixture(coreFixture);
-
+    const DeflatingERC20 = await artifacts.readArtifact('DeflatingERC20');
     router = fixture.router02;
 
     DTT = await deployContract(wallet, DeflatingERC20, [expandTo18Decimals(10000)]);

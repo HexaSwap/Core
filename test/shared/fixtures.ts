@@ -1,16 +1,8 @@
 /* eslint-disable node/no-missing-import */
 import { Wallet, Contract, providers } from 'ethers';
+import { artifacts } from 'hardhat';
 import { deployContract } from 'ethereum-waffle';
 import { expandTo18Decimals, overrides } from './utilities';
-
-import HexaFinityFactory from '../../artifacts/src/exchange-protocol/HexaFinityFactory.sol/HexaFinityFactory.json';
-import HexaFinityRouter from '../../artifacts/src/exchange-protocol/HexaFinityRouter.sol/HexaFinityRouter.json';
-import HexaFinityRouter01 from '../../artifacts/src/exchange-protocol/HexaFinityRouter01.sol/HexaFinityRouter01.json';
-import HexaFinityPair from '../../artifacts/src/exchange-protocol/HexaFinityPair.sol/HexaFinityPair.json';
-import HexaFinityMigrator from '../../artifacts/src/exchange-protocol/HexaFinityMigrator.sol/HexaFinityMigrator.json';
-import RouterEventEmitter from '../../artifacts/src/exchange-protocol/test/RouterEventEmitter.sol/RouterEventEmitter.json';
-import HERC20 from '../../artifacts/src/exchange-protocol/test/HERC20.sol/HERC20.json';
-import WETH9 from '../../artifacts/src/exchange-protocol/test/WETH9.sol/WETH9.json';
 
 import HexaFinityV1Exchange from '../../buildV1/HexaFinityV1Exchange.json';
 import HexaFinityV1Factory from '../../buildV1/HexaFinityV1Factory.json';
@@ -33,6 +25,14 @@ interface CoreFixture {
 }
 
 export async function coreFixture([wallet]: Wallet[], provider: providers.Web3Provider): Promise<CoreFixture> {
+  const HexaFinityFactory = await artifacts.readArtifact('HexaFinityFactory');
+  const HexaFinityRouter = await artifacts.readArtifact('HexaFinityRouter');
+  const HexaFinityPair = await artifacts.readArtifact('HexaFinityPair');
+  const HexaFinityMigrator = await artifacts.readArtifact('HexaFinityMigrator');
+  const HexaFinityRouter01 = await artifacts.readArtifact('HexaFinityRouter01');
+  const RouterEventEmitter = await artifacts.readArtifact('RouterEventEmitter');
+  const HERC20 = await artifacts.readArtifact('HERC20');
+  const WETH9 = await artifacts.readArtifact('WETH9');
   // deploy tokens
   const tokenA = await deployContract(wallet, HERC20, [expandTo18Decimals(10000)]);
   const tokenB = await deployContract(wallet, HERC20, [expandTo18Decimals(10000)]);

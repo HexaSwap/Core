@@ -2,11 +2,10 @@
 import chai, { expect } from 'chai';
 import { Contract, constants } from 'ethers';
 import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle';
+import { artifacts } from 'hardhat';
 
 import { expandTo18Decimals, overrides } from '../shared/utilities';
 import { coreFixture } from '../shared/fixtures';
-
-import ExampleSwapToPrice from '../../artifacts/src/exchange-protocol/examples/ExampleSwapToPrice.sol/ExampleSwapToPrice.json';
 
 chai.use(solidity);
 
@@ -29,6 +28,7 @@ describe('ExampleSwapToPrice', () => {
   let swapToPriceExample: Contract;
   let router: Contract;
   beforeEach(async function () {
+    const ExampleSwapToPrice = await artifacts.readArtifact('ExampleSwapToPrice');
     const fixture = await loadFixture(coreFixture);
     token0 = fixture.token0;
     token1 = fixture.token1;
