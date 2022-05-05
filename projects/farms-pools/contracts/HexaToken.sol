@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-import "../bsc-library/BEP20.sol";
+import "bsc-library/contracts/BEP20.sol";
 
 // HexaToken with Governance.
 contract HexaToken is BEP20('Hexa Finity Token', 'HEXA') {

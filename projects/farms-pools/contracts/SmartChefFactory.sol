@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-import "../oldOpenzeppelin/contracts/access/Ownable.sol";
-import "../bsc-library/IBEP20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "bsc-library/contracts/IBEP20.sol";
 
 import "./SmartChefInitializable.sol";
 
